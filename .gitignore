@@ -168,7 +168,7 @@ cython_debug/
 Thumbs.db
 
 # Django media files (uncomment if you want to ignore uploaded media)
-# media/
+media/
 
 # Django static files (uncomment if you want to ignore collected static files)
 # static/

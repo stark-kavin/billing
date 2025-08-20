@@ -1,6 +1,7 @@
 from pathlib import Path
 from decouple import config
 import dj_database_url
+from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,12 +11,15 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 
-# Add Vercel domain to allowed hosts if in production
+if not isinstance(ALLOWED_HOSTS, list):
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 if not DEBUG:
     ALLOWED_HOSTS.extend(['.vercel.app', '.now.sh'])
 
 INSTALLED_APPS = [
     "core",
+    "driver",
 ]
 
 INSTALLED_APPS += [
@@ -61,25 +65,19 @@ WSGI_APPLICATION = 'Project.wsgi.application'
 
 import os
 
-# Database configuration
-DB_URI = config('DB_URI', default=None)
+DB_URI: Any = config('DB_URI', default=None)
 
 if DB_URI and not config('DB_DEV', default=False, cast=bool):
-    # Use PostgreSQL database from URI
     DATABASES = {
         'default': dj_database_url.parse(DB_URI)
     }
 else:
-    # Fallback to SQLite for development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -97,9 +95,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = config('TIME_ZONE', default='UTC')
@@ -109,37 +104,27 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# GraphQL configuration
 GRAPHENE = {
-    'SCHEMA': 'Project.schema.schema',  # Adjust according to your file structure
+    'SCHEMA': 'Project.schema.schema',
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
 
-# Authentication backends
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
