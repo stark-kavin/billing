@@ -22,7 +22,7 @@ class SiteConfiguration(SingletonModel):
     phone1 = models.CharField(
         max_length=10,
         validators=[
-            MinLengthValidator(5),
+            MinLengthValidator(10, message="Phone number must be exactly 10 digits long."),
             RegexValidator(
                 regex=r'^\d+$',
                 message='Phone number must contain only digits',
@@ -36,7 +36,7 @@ class SiteConfiguration(SingletonModel):
     phone2 = models.CharField(
         max_length=10,
         validators=[
-            MinLengthValidator(5),
+            MinLengthValidator(10, message="Phone number must be exactly 10 digits long."),
             RegexValidator(
                 regex=r'^\d+$',
                 message='Phone number must contain only digits',

@@ -2,6 +2,7 @@ from core.models import SiteConfiguration
 import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth.models import User
+from graphql import GraphQLError
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -26,12 +27,18 @@ class CoreQuery(graphene.ObjectType):
     me = graphene.Field(UserType)
     
     def resolve_site_config(self, info):
-        if SiteConfiguration.objects.all().count() == 0:
-            SiteConfiguration.objects.create()
-        return SiteConfiguration.load()
+        try:
+            if SiteConfiguration.objects.all().count() == 0:
+                SiteConfiguration.objects.create()
+            return SiteConfiguration.load()
+        except Exception as e:
+            raise GraphQLError(f"Error fetching site configuration: {str(e)}")
     
     def resolve_me(self, info):
-        user = info.context.user
-        if user.is_anonymous:
-            raise Exception("Authentication required!")
-        return user
+        try:
+            user = info.context.user
+            if user.is_anonymous:
+                raise GraphQLError("Authentication required!")
+            return user
+        except Exception as e:
+            raise GraphQLError(f"Error fetching user information: {str(e)}")
