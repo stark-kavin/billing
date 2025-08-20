@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphql import GraphQLError
 from ..models import Driver
 
 
@@ -14,10 +15,15 @@ class DriverQuery(graphene.ObjectType):
     driver = graphene.Field(DriverType, id=graphene.Int(required=True))
 
     def resolve_all_drivers(self, info):
-        return Driver.objects.all()
+        try:
+            return Driver.objects.all()
+        except Exception as e:
+            raise GraphQLError(f"Error fetching drivers: {str(e)}")
 
     def resolve_driver(self, info, id):
         try:
             return Driver.objects.get(pk=id)
         except Driver.DoesNotExist:
-            return None
+            raise GraphQLError(f"Driver with id {id} not found.")
+        except Exception as e:
+            raise GraphQLError(f"Error fetching driver: {str(e)}")
