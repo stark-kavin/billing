@@ -7,15 +7,14 @@ class Driver(models.Model):
         max_length=10,
         blank=True,
         null=True,
+        validators=[
+            RegexValidator(
+                regex=r'^\d+$',
+                message="Phone number must be numeric."
+            ),
+            MinLengthValidator(10, message="Phone number must be exactly 10 digits long.")
+        ]
     )
-
-    validators=[
-        RegexValidator(
-            regex=r'^\d+$',
-            message="Phone number must be numeric."
-        ),
-        MinLengthValidator(10, message="Phone number must be exactly 10 digits long.")
-    ]
 
     def __str__(self):
         return self.name

@@ -20,6 +20,7 @@ if not DEBUG:
 INSTALLED_APPS = [
     "core",
     "driver",
+    "vehicle",
 ]
 
 INSTALLED_APPS += [
@@ -31,6 +32,7 @@ INSTALLED_APPS += [
     'django.contrib.staticfiles',
     
     'graphene_django',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

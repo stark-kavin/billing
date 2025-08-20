@@ -19,21 +19,36 @@ class UpdateSiteConfiguration(graphene.Mutation):
     @classmethod
     @login_required
     def mutate(cls, root, info, **kwargs):
-        # Load the singleton instance
-        site_config = SiteConfiguration.load()
+        try:
+            # Load the singleton instance
+            site_config = SiteConfiguration.load()
 
-        # Handle file upload separately
-        site_logo = kwargs.pop('site_logo', None)
-        
-        # Update regular fields
-        for field, value in kwargs.items():
-            setattr(site_config, field, value)
+            # Handle file upload separately
+            site_logo = kwargs.pop('site_logo', None)
+            
+            # Validate phone numbers if provided
+            for phone_field in ['phone1', 'phone2']:
+                if phone_field in kwargs and kwargs[phone_field]:
+                    phone = kwargs[phone_field].strip()
+                    if not phone.isdigit():
+                        raise GraphQLError(f"{phone_field} must contain only digits.")
+                    if len(phone) != 10:
+                        raise GraphQLError(f"{phone_field} must be exactly 10 digits long.")
+                    kwargs[phone_field] = phone
+            
+            # Update regular fields
+            for field, value in kwargs.items():
+                setattr(site_config, field, value)
 
-        # Handle file upload if provided
-        if site_logo is not None:
-            site_config.site_logo.save(site_logo.name, site_logo, save=False)
+            # Handle file upload if provided
+            if site_logo is not None:
+                site_config.site_logo.save(site_logo.name, site_logo, save=False)
 
-        site_config.full_clean()  # runs validators
-        site_config.save()
+            site_config.full_clean()  # runs validators
+            site_config.save()
 
-        return UpdateSiteConfiguration(site_config=site_config)
+            return UpdateSiteConfiguration(site_config=site_config)
+        except GraphQLError:
+            raise
+        except Exception as e:
+            raise GraphQLError(f"Error updating site configuration: {str(e)}")
