@@ -28,8 +28,6 @@ class CoreQuery(graphene.ObjectType):
     
     def resolve_site_config(self, info):
         try:
-            if SiteConfiguration.objects.all().count() == 0:
-                SiteConfiguration.objects.create()
             return SiteConfiguration.load()
         except Exception as e:
             raise GraphQLError(f"Error fetching site configuration: {str(e)}")
