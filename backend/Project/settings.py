@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "core",
     "driver",
     "vehicle",
+    "party"
 ]
 
 INSTALLED_APPS += [

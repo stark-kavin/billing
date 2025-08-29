@@ -27,10 +27,18 @@ from vehicle.schema.mutation import (
     DeleteVehicleExpenseMutation
 )
 
+from party.schema.query import PartyQuery
+from party.schema.mutation import (
+    CreateParty,
+    UpdateParty,
+    DeleteParty
+)
+
 class Query(graphene.ObjectType):
     core = graphene.Field(CoreQuery)
     driver = graphene.Field(DriverQuery)
     vehicle = graphene.Field(VehicleQuery)
+    party = graphene.Field(PartyQuery)
 
     def resolve_core(self, info):
         return CoreQuery()
@@ -41,6 +49,8 @@ class Query(graphene.ObjectType):
     def resolve_vehicle(self, info):
         return VehicleQuery()
 
+    def resolve_party(self, info):
+        return PartyQuery()
 
 class Mutation(graphene.ObjectType):
 
@@ -75,5 +85,9 @@ class Mutation(graphene.ObjectType):
     update_vehicle_expense = UpdateVehicleExpenseMutation.Field()
     delete_vehicle_expense = DeleteVehicleExpenseMutation.Field()
 
+    # Party mutations
+    create_party = CreateParty.Field()
+    update_party = UpdateParty.Field()
+    delete_party = DeleteParty.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
