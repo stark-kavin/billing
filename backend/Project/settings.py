@@ -69,19 +69,11 @@ WSGI_APPLICATION = 'Project.wsgi.application'
 
 import os
 
-DB_URI: Any = config('DB_URI', default=None)
+DB_URI: Any = config('DB_URI', default=None, cast=str)
 
-if DB_URI and not config('DB_DEV', default=False, cast=bool):
-    DATABASES = {
-        'default': dj_database_url.parse(DB_URI)
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASES = {
+    'default': dj_database_url.parse(DB_URI)
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
